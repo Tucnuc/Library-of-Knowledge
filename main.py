@@ -109,9 +109,6 @@ class Book:
     print(f"Status: {self.status}")
     print("")
 
-  def displayBookName(self):
-    return self.name
-
   def updateStatus(self, newStatus):
     self.status = newStatus
 
