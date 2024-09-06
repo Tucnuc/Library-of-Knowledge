@@ -1,5 +1,6 @@
 # IMPORTS
 import random
+from data import booksList, visitorsList
 
 
 #   VISITOR SECTION
@@ -480,13 +481,13 @@ def startingPoint():
 #   OTHER
 # ---------
 
-# CREATING INITIAL ACCOUNTS, BOOKS
-administrator = Visitor("1", "Adam", [], "1235", True)
-visitorDatabase.append(administrator)
-takenIds.append(administrator.id)
+# ADDING INITIAL ACCOUNTS, BOOKS
+for visitor in visitorsList:
+  visitorDatabase.append(visitor)
+  takenIds.append(visitor.id)
 
-book1 = Book("The Hobbit", "J.R.R. Tolkien", "8384938", "Available")
-bookDatabase.append(book1)
+for book in booksList:
+  bookDatabase.append(book)
 
 # STARTING THE APPLICATION
 startingPoint()
