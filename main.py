@@ -1,5 +1,11 @@
+# IMPORTS
 import random
 
+
+#   VISITOR SECTION
+# -------------------
+
+# VISITOR CLASS
 class Visitor:
   def __init__(self, id, name, books, password, admin):
     self.id = id
@@ -11,7 +17,10 @@ class Visitor:
   def displayProfile(self):
     print(f"Name: {self.name}")
     print(f"ID: {self.id}")
-    print(f"Borrowed Books: {self.books}")
+    borrowedBooks = []
+    for book in self.books:
+      borrowedBooks.append(book.name)
+    print(f'Borrowed Books: {", ".join(map(str, borrowedBooks))}')
     if self.admin:
       print("")
       print("Rank: Administrator")
@@ -19,14 +28,22 @@ class Visitor:
   def adminDisplayProfile(self):
     print(f"Name: {self.name}")
     print(f"ID: {self.id}")
-    print(f"Borrowed Books: {self.books}")
+    borrowedBooks = []
+    for book in self.books:
+      borrowedBooks.append(book.name)
+    print(f'Borrowed Books: {", ".join(map(str, borrowedBooks))}')
     print(f"Password: {self.password}")
 
+  def displayProfileList(self):
+    print(f"ID: {self.id} | Name: {self.name}")
+    
+# VALUES FOR THE REGISTER AND LOGIN SYSTEM
 visitorDatabase = []
 takenIds = []
 loggedIn = False
 currentVisitor = ""
 
+# LOGIN FUNCTION
 def loginVisitor():
   global currentVisitor, loggedIn
   print("Welcome to the Login Page.")
@@ -44,7 +61,7 @@ def loginVisitor():
       return
   print("Login failed. Try again.")
   print("")
-  
+
   def choice():
     decision = input("Do you want to create a new account or try again? [1 - Create account, 2 - Another try]: ")
     print("")
@@ -59,42 +76,82 @@ def loginVisitor():
 
   choice()
 
-
+# REGISTER FUNCTION
 def registerVisitor():
+  def createName():
+    name = input("Enter your name: ")
+    for visitor in visitorDatabase:
+      if visitor.name == name:
+        print("Name already taken.")
+        print("")
+        return createName()
+    return name
+  def createPassword():
+    password = input("Enter your password: ")
+    password2 = input("Confirm your password: ")
+    print("")
+    if password == password2:
+      return password
+    else:
+      print("Passwords do not match. Please try again.")
+      print("")
+      return createPassword()
+  def generateId():
+    id = random.randint(1, 10000)
+    if id in takenIds:
+      return generateId()
+    else:
+      takenIds.append(id)
+      return id
+      
   user = Visitor(generateId(), createName(), [], createPassword(), False)
   visitorDatabase.append(user)
   print("Registration successfull. Moving you to the login page..")
   print("")
   loginVisitor()
 
-def createName():
-  name = input("Enter your name: ")
-  for visitor in visitorDatabase:
-    if visitor.name == name:
-      print("Name already taken.")
+#ACCOUNT DELETING
+def accountDeletion():
+  global visitorDatabase
+  name = input("Enter name of the account: ")
+  for account in visitorDatabase:
+    if account.name == name:
+      print("Account found. Displaying details:")
+      account.displayProfile()
       print("")
-      return createName()
-  return name
+      def choice(account):
+        decision = input("Do you want to delete this account? [1 - Yes, 2 - No]: ")
+        print("")
+        if decision == "1":
+          visitorDatabase.remove(account)
+          print("Account deleted successfully.")
+          print("")
+          print("Returning to the center..")
+          print("")
+          input("Press enter to continue..")
+          print("")
+          theHub()
+        elif decision == "2":
+          print("Returning to the center..")
+          print("")
+          input("Press enter to continue..")
+          print("")
+          theHub()
+        else:
+          print("Invalid choice. Please, try again.")
+          print("")
+          choice(account)
 
-def createPassword():
-  password = input("Enter your password: ")
-  password2 = input("Confirm your password: ")
+      choice(account)
+      return
+  print("Account not found. Please try again.")
   print("")
-  if password == password2:
-    return password
-  else:
-    print("Passwords do not match. Please try again.")
-    print("")
-    return createPassword()
-    
-def generateId():
-  id = random.randint(1, 10000)
-  if id in takenIds:
-    return generateId()
-  else:
-    takenIds.append(id)
-    return id
+  accountDeletion()
 
+#   BOOK SECTION
+# ----------------
+
+# BOOK CLASS
 class Book:
   def __init__(self, name, author, isbn, status):
     self.name = name
@@ -109,9 +166,13 @@ class Book:
     print(f"Status: {self.status}")
     print("")
 
+  def displayBookList(self):
+    print(f"Name: {self.name} | Author: {self.author}")
+
   def updateStatus(self, newStatus):
     self.status = newStatus
 
+# BOOK ADDING
 bookDatabase = []
 def createBook():
   name = input("Enter the name of the book: ")
@@ -125,11 +186,12 @@ def createBook():
   print("")
   theHub()
 
+# BOOK REMOVING
 selectedBookForRemoval = ""
 def removeBook():
   global selectedBookForRemoval
   def choice():
-    decision = input("Do you want to remove this book? [1 - yes, 2 - no]:")
+    decision = input("Do you want to remove this book? [1 - Yes, 2 - No]: ")
     print("")
     if decision == "1":
       bookDatabase.remove(selectedBookForRemoval)
@@ -144,7 +206,7 @@ def removeBook():
       print("Invalid choice. Please, try again.")
       print("")
       choice()
-      
+
   name = input("Enter the name of the book you want to remove: ")
   for book in bookDatabase:
     if book.name == name:
@@ -153,17 +215,107 @@ def removeBook():
       book.displayBook()
       selectedBookForRemoval = book
       choice()
-  
+
   print("Book not found. Try again.")
   print("")
   removeBook()
 
+# BOOK BORROWING/RETURNING
+def bookAction():
+  def choice():
+    decision = input("Do you want to borrow or return a book? [1 - Borrow, 2 - Return]: ")
+    print("")
+    if decision == "1":
+      borrowBook()
+    elif decision == "2":
+      returnBook()
+    else:
+      print("Invalid choice. Please, try again.")
+      print("")
+      choice()
+
+  def borrowBook():
+    def choice():
+      name = input("Enter the name of the book you want to borrow: ")
+      print("")
+      for book in bookDatabase:
+        if book.name == name:
+          print("Book found successfully. Book details: ")
+          book.displayBook()
+          print("")
+          if book.status != "Available":
+            print("This book is not available at the moment. We're sorry for the incovenience.")
+            print("Returning to the center..")
+            print("")
+            input("Press enter to continue: ")
+            print("")
+            theHub()
+            return
+          def choice2(book):
+            decision = input("Do you want to borrow this book? [1 - Yes, 2 - No]: ")
+            print("")
+            if decision == "1":
+              book.updateStatus("Borrowed")
+              currentVisitor.books.append(book)
+              print("Book borrowed successfully. Returning to the center..")
+              print("")
+              theHub()
+              return
+            elif decision == "2":
+              print("Returning to the center..")
+              print("")
+              theHub()
+              return
+            
+          choice2(book)
+          return
+      print("Book not found. Please, try again.")
+      print("")
+      choice()
+
+    choice()
+  
+  def returnBook():
+    if len(currentVisitor.books) == 0:
+      print("You've got no books to return. Returning to the center..")
+      print("")
+      input("Press Enter to continue: ")
+      print("")
+      theHub()
+      return
+
+    def choice():
+      name = input("Enter the name of the book you want to return: ")
+      for book in currentVisitor.books:
+        if book.name == name:
+          currentVisitor.books.remove(book)
+          book.updateStatus("Available")
+          print("Book found. Return succesfull. Time limit hasn't been violated, free of charge.")
+          print("Returning to the center..")
+          print("")
+          input("Press Enter to continue: ")
+          print("")
+          theHub()
+          return
+      print("Book not found. Please, try again.")
+      print("")
+      choice() 
+
+    choice()
+    
+  choice()
+
+
+#   LOCATIONS SECTION
+# ---------------------
+
+# CENTER OF THE LIBRARY
 def theHub():
   print("Welcome to the center of the library. Choose where you want to go from here.")
   print("")
   print("1. Look into the book list.")
   print("2. Find more information about a specific book.")
-  print("3. Borrow a book.")
+  print("3. Borrow or return a book.")
   print("4. Display account information.")
   print("5. Leave the library.")
   print("")
@@ -175,8 +327,8 @@ def theHub():
     print("9. Find more information about a specific account.")
     print("10. Delete an account from the database.")
     print("")
-  
-  def choice():
+
+  def choiceMain():
     global currentVisitor
 
     def pause():
@@ -189,19 +341,64 @@ def theHub():
     print("")
     if decision == "1":
       print("Here's the list of all books:")
-      index = 1
       for book in bookDatabase:
-        print(f"{index}. {book.name}")
-        index += 1
+        book.displayBookList()
       pause()
       return
     elif decision == "2":
-      print("Info here..")
-      pause()
+      def choice():
+        def nameSearch():
+          name = input("Enter the name of the book: ")
+          print("")
+          for book in bookDatabase:
+            if book.name == name:
+              print("Book found successfully. Book details: ")
+              book.displayBook()
+              print("")
+              print("Returning to the center..")
+              pause()
+              theHub()
+              return
+          print("Book not found. Please, try again.")
+          print("")
+          nameSearch()
+
+        def authorSearch():
+          name = input("Enter the name of the author: ")
+          print("")
+          index = 0
+          for book in bookDatabase:
+            if book.author == name:
+              print("Book found successfully. Book details: ")
+              book.displayBook()
+              index += 1
+          if index != 0:
+            print("")
+            print("Returning to the center..")
+            pause()
+            theHub()
+            return
+          print("No books found. Please, try again.")
+          print("")
+          authorSearch()
+        
+        decision = input("Do you want to search by name or by author? [1 - Name, 2 - Author]: ")
+        if decision == "1":
+          nameSearch()
+          return
+        elif decision == "2":
+          authorSearch()
+          return
+        else:
+          print("Incorrect choice. Please, try again.")
+          print("")
+          choice()
+          return
+          
+      choice()
       return
     elif decision == "3":
-      print("Borrowing a book..")
-      pause()
+      bookAction()
       return
     elif decision == "4":
       print("Here's your detailed account information:")
@@ -212,6 +409,7 @@ def theHub():
       print(f"We wish you a safe journey, {currentVisitor.name}.")
       print("")
       currentVisitor = ""
+      input("Press enter to continue: ")
       startingPoint()
       return
     elif decision == "6" and currentVisitor.admin:
@@ -225,28 +423,41 @@ def theHub():
     elif decision == "8" and currentVisitor.admin:
       print("Displaying the list of registered accounts:")
       for visitor in visitorDatabase:
-        print(f"ID: {visitor.id} | Name: {visitor.name}")
+        visitor.displayProfileList()
       pause()
       return
     elif decision == "9" and currentVisitor.admin:
-      print("Displaying..")
-      pause()
+      def choice():
+        name = input("Enter the name of the account: ")
+        for account in visitorDatabase:
+          if account.name == name:
+            account.adminDisplayProfile()
+            print("")
+            print("Returning to the center..")
+            pause()
+            theHub()
+            return
+        print("Account not found. Please, try again.")
+        print("")
+        choice()
+        
+      choice()
       return
     elif decision == "10" and currentVisitor.admin:
-      print("Deleting..")
-      pause()
+      print("Welcome to the Account Deletion Page.")
+      accountDeletion()
       return
     else:
       print("Invalid choice. Please, try again.")
       print("")
-      choice()
-    
-  choice()
+      choiceMain()
 
+  choiceMain()
 
+# OUTSIDE OF THE LIBRARY
 def startingPoint():
   print("Welcome, visitor. Before you can access all the knowledge on the continent, you need to verify yourself.")
-  
+
   def choice():
     decision = input("Either login into an existing account or register a new one. [1 - Login, 2 - Registration]: ")
     print("")
@@ -265,8 +476,17 @@ def startingPoint():
 
   choice()
 
+
+#   OTHER
+# ---------
+
+# CREATING INITIAL ACCOUNTS, BOOKS
 administrator = Visitor("1", "Adam", [], "1235", True)
 visitorDatabase.append(administrator)
 takenIds.append(administrator.id)
 
+book1 = Book("The Hobbit", "J.R.R. Tolkien", "8384938", "Available")
+bookDatabase.append(book1)
+
+# STARTING THE APPLICATION
 startingPoint()
