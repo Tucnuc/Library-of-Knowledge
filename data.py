@@ -14,7 +14,7 @@ class Book:
     print("")
 
   def displayBookList(self):
-    print(f"Name: {self.name} | Author: {self.author}")
+    print(f"{self.name} | Author: {self.author}")
 
   def updateStatus(self, newStatus):
     self.status = newStatus

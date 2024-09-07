@@ -37,7 +37,7 @@ class Visitor:
 
   def displayProfileList(self):
     print(f"ID: {self.id} | Name: {self.name}")
-    
+
 # VALUES FOR THE REGISTER AND LOGIN SYSTEM
 visitorDatabase = []
 takenIds = []
@@ -104,7 +104,7 @@ def registerVisitor():
     else:
       takenIds.append(id)
       return id
-      
+
   user = Visitor(generateId(), createName(), [], createPassword(), False)
   visitorDatabase.append(user)
   print("Registration successfull. Moving you to the login page..")
@@ -168,7 +168,7 @@ class Book:
     print("")
 
   def displayBookList(self):
-    print(f"Name: {self.name} | Author: {self.author}")
+    print(f"{self.name} | Author: {self.author}")
 
   def updateStatus(self, newStatus):
     self.status = newStatus
@@ -185,6 +185,8 @@ def createBook():
   print("")
   print("Book added successfully. Returning to the center..")
   print("")
+  input("Press Enter to continue: ")
+  print("")
   theHub()
 
 # BOOK REMOVING
@@ -198,9 +200,13 @@ def removeBook():
       bookDatabase.remove(selectedBookForRemoval)
       print("Book removed successfully. Returning to the center..")
       print("")
+      input("Press Enter to continue: ")
+      print("")
       theHub()
     elif decision == "2":
       print("Returning to the center..")
+      print("")
+      input("Press Enter to continue: ")
       print("")
       theHub()
     else:
@@ -209,6 +215,7 @@ def removeBook():
       choice()
 
   name = input("Enter the name of the book you want to remove: ")
+  print("")
   for book in bookDatabase:
     if book.name == name:
       print("Book found successfully. Book details: ")
@@ -243,9 +250,9 @@ def bookAction():
         if book.name == name:
           print("Book found successfully. Book details: ")
           book.displayBook()
-          print("")
           if book.status != "Available":
             print("This book is not available at the moment. We're sorry for the incovenience.")
+            print("")
             print("Returning to the center..")
             print("")
             input("Press enter to continue: ")
@@ -260,6 +267,8 @@ def bookAction():
               currentVisitor.books.append(book)
               print("Book borrowed successfully. Returning to the center..")
               print("")
+              input("Press Enter to continue: ")
+              print("")
               theHub()
               return
             elif decision == "2":
@@ -267,7 +276,7 @@ def bookAction():
               print("")
               theHub()
               return
-            
+
           choice2(book)
           return
       print("Book not found. Please, try again.")
@@ -275,7 +284,7 @@ def bookAction():
       choice()
 
     choice()
-  
+
   def returnBook():
     if len(currentVisitor.books) == 0:
       print("You've got no books to return. Returning to the center..")
@@ -287,11 +296,14 @@ def bookAction():
 
     def choice():
       name = input("Enter the name of the book you want to return: ")
+      print("")
       for book in currentVisitor.books:
         if book.name == name:
           currentVisitor.books.remove(book)
           book.updateStatus("Available")
-          print("Book found. Return succesfull. Time limit hasn't been violated, free of charge.")
+          print("Book found. Return succesfull.")
+          print("Time limit hasn't been violated, free of charge.")
+          print("")
           print("Returning to the center..")
           print("")
           input("Press Enter to continue: ")
@@ -303,7 +315,7 @@ def bookAction():
       choice() 
 
     choice()
-    
+
   choice()
 
 
@@ -355,7 +367,6 @@ def theHub():
             if book.name == name:
               print("Book found successfully. Book details: ")
               book.displayBook()
-              print("")
               print("Returning to the center..")
               pause()
               theHub()
@@ -374,7 +385,6 @@ def theHub():
               book.displayBook()
               index += 1
           if index != 0:
-            print("")
             print("Returning to the center..")
             pause()
             theHub()
@@ -382,8 +392,9 @@ def theHub():
           print("No books found. Please, try again.")
           print("")
           authorSearch()
-        
+
         decision = input("Do you want to search by name or by author? [1 - Name, 2 - Author]: ")
+        print("")
         if decision == "1":
           nameSearch()
           return
@@ -395,7 +406,7 @@ def theHub():
           print("")
           choice()
           return
-          
+
       choice()
       return
     elif decision == "3":
@@ -411,6 +422,7 @@ def theHub():
       print("")
       currentVisitor = ""
       input("Press enter to continue: ")
+      print("")
       startingPoint()
       return
     elif decision == "6" and currentVisitor.admin:
@@ -441,7 +453,7 @@ def theHub():
         print("Account not found. Please, try again.")
         print("")
         choice()
-        
+
       choice()
       return
     elif decision == "10" and currentVisitor.admin:
@@ -458,13 +470,12 @@ def theHub():
 # OUTSIDE OF THE LIBRARY
 def startingPoint():
   print("Welcome, visitor. Before you can access all the knowledge on the continent, you need to verify yourself.")
+  print("")
 
   def choice():
     decision = input("Either login into an existing account or register a new one. [1 - Login, 2 - Registration]: ")
     print("")
     if decision == "1":
-      print("Moving to the Login Page..")
-      print("")
       loginVisitor()
     elif decision == "2":
       print("Moving to the Registration Page..")
