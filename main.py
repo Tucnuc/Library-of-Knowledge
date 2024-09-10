@@ -124,6 +124,9 @@ def accountDeletion():
         decision = input("Do you want to delete this account? [1 - Yes, 2 - No]: ")
         print("")
         if decision == "1":
+          for book in account.books:
+            if book.status == "Borrowed":
+              book.updateStatus('Available')
           visitorDatabase.remove(account)
           print("Account deleted successfully.")
           print("")
