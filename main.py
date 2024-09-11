@@ -1,6 +1,8 @@
 # IMPORTS
 import random
 from data import booksList, visitorsList
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 #   VISITOR SECTION
@@ -114,6 +116,7 @@ def registerVisitor():
 #ACCOUNT DELETING
 def accountDeletion():
   global visitorDatabase
+  print(takenIds)
   name = input("Enter name of the account: ")
   for account in visitorDatabase:
     if account.name == name:
@@ -127,6 +130,7 @@ def accountDeletion():
           for book in account.books:
             if book.status == "Borrowed":
               book.updateStatus('Available')
+          takenIds.remove(account.id)
           visitorDatabase.remove(account)
           print("Account deleted successfully.")
           print("")
@@ -321,6 +325,38 @@ def bookAction():
 
   choice()
 
+# BOOK STATISTICS
+def bookStatistics():
+  def randomNumber():
+    return random.randint(1, 15)
+  
+  usedBooks = []
+  def bookNameRandom():
+    index = random.randint(0, len(bookDatabase)-1)
+    usedBooks.append(index)
+    return bookDatabase[index].name
+
+  plt.style.use('_mpl-gallery')
+
+  x = 0.5 + np.arange(8)
+  y = [randomNumber() for _ in range(8)]
+
+  fig, ax = plt.subplots()
+
+  ax.bar(x, y, width=1, edgecolor="white", linewidth=0.7)
+
+  ax.set(xlim=(0, 8), xticks=np.arange(1, 9),
+        ylim=(0, 8), yticks=np.arange(0, 9, 1))
+
+  x_labels = [bookNameRandom() for _ in range(8)]
+  ax.set_xticks(x)
+  ax.set_xticklabels(x_labels)
+
+  plt.subplots_adjust(bottom=0.05)
+
+  plt.show()
+
+
 
 #   LOCATIONS SECTION
 # ---------------------
@@ -342,6 +378,7 @@ def theHub():
     print("8. Check a list of registered accounts.")
     print("9. Find more information about a specific account.")
     print("10. Delete an account from the database.")
+    print("11. Display books statistics.")
     print("")
 
   def choiceMain():
@@ -462,6 +499,10 @@ def theHub():
     elif decision == "10" and currentVisitor.admin:
       print("Welcome to the Account Deletion Page.")
       accountDeletion()
+      return
+    elif decision == "11" and currentVisitor.admin:
+      print("Welcome to the Books Statistics Page.")
+      bookStatistics()
       return
     else:
       print("Invalid choice. Please, try again.")
